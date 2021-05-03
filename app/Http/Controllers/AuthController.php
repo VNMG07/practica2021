@@ -33,17 +33,46 @@ class AuthController extends Controller
         return view('auth/login');
     }
 
-    public function register(Request $request)
-    {
-        //TODO
-        if ($request->isMethod('post')) {
-            //validate request
-            //create user
-            // login user or send activate email
-            //redirected to dashboard/login
+    public function register() {
+        return view('auth/register');
+    }
+
+    public function store(Request $request) {
+
+        $request->validate(
+            [
+                'name'=>'required|string|max:20',
+                'email' => 'required|email|unique:users,email',
+
+                'password' => 'required|alpha_num|min:6',
+
+
+            ]
+        );
+
+        $dataArray = array(
+            "name"  =>  $request->name,
+            "email" =>  $request->email,
+            "avatar" =>  $request->avatar,
+            "password" =>  bcrypt( $request->password)
+
+        );
+         function avatar() {
+             return view('avatar-upload');
+           }
+
+        $user = User::create($dataArray);
+        if(!is_null($user)) {
+            return back()->with("success", "Success! Registration completed");
         }
 
-        //return view register
-        return 'REGISTER';
-    }
+        else {
+            return back()->with("failed", "Alert! Failed to register");
+        }
+
+
+                return redirect('/dashboard');
+
 }
+
+   }
