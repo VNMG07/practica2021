@@ -21,6 +21,8 @@ Route::get('/', function () {
 
 Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login');
 Route::match(['get', 'post'], '/register', [AuthController::class, 'register'])->name('register');
+Route::get("user", [AuthController::class, 'register']);
+Route::post("user/register", [AuthController::class, 'store']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 //forgot password
