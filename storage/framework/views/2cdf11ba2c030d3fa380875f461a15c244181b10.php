@@ -1,17 +1,15 @@
-
-
 <?php $__env->startSection('content'); ?>
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Blank Page</h1>
+                    <h1>Boards</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Blank Page</li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Boards</li>
                     </ol>
                 </div>
             </div>
@@ -24,57 +22,55 @@
         <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Bordered Table</h3>
+                <h3 class="card-title">Boards list</h3>
             </div>
-            <!-- /.card-header -->
 
             <div class="card-body">
                 <table class="table table-bordered">
                     <thead>
-                        <tr>
-                            <th style="width: 10px">#</th>
-                            <th>Name</th>
-
-                            <th>User ID</th>
-                            <th style="width: 100px">Actions</th>
-
-                        </tr>
+                    <tr>
+                        <th style="width: 10px">#</th>
+                        <th>Name</th>
+                        <th>User</th>
+                        <th>Members</th>
+                        <th style="width: 40px">Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <?php $__currentLoopData = $boards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $board): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php if(Auth::user()->role === \App\Models\User::ROLE_ADMIN): ?>
-                            <tr>
-                                <td><?php echo e($board->id); ?></td>
-                                <td><?php echo e($board->name); ?></td>
-                               <td><?php echo e($board->user()->first()->name); ?></td>
+                    <?php $__currentLoopData = $boards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $board): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td><?php echo e($board->id); ?></td>
+                            <td>
+                                <a href="<?php echo e(route('board.view', ['id' => $board->id])); ?>"
+                                   class="link"><?php echo e($board->name); ?></a>
+                            </td>
+                            <td><?php echo e($board->user->name); ?></td>
+                            <td>
+                                <?php echo e(count($board->boardUsers)); ?>
 
-                                <td>
+                            </td>
+                            <td>
+                                <?php if($user->role === \App\Models\User::ROLE_ADMIN || $user->id === $board->user->id): ?>
                                     <div class="btn-group">
-                                        <button class="btn btn-xs btn-primary" type="button" data-user="<?php echo e(json_encode($board)); ?>" data-toggle="modal" data-target="#edit-modal">
+                                        <button class="btn btn-xs btn-primary"
+                                                type="button"
+                                                data-board="<?php echo e(json_encode($board)); ?>"
+                                                data-toggle="modal"
+                                                data-target="#boardEditModal">
                                             <i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-xs btn-danger" type="button" data-user="<?php echo e(json_encode($board)); ?>" data-toggle="modal" data-target="#delete-modal">
+                                        <button class="btn btn-xs btn-danger"
+                                                type="button"
+                                                data-board="<?php echo e(json_encode($board)); ?>"
+                                                data-toggle="modal"
+                                                data-target="#boardDeleteModal">
                                             <i class="fas fa-trash"></i></button>
                                     </div>
-                                </td>
-                            </tr>
-                            <?php else: ?>
-                            <?php if($board->user_id === Auth::user()->id): ?>
-                            <tr>
-                            <td><?php echo e($board->id); ?></td>
-                                  <td><a href="<?php echo e(route('tasks.all')); ?>"><?php echo e($board->name); ?></a></td>
-                                  <td><?php echo e($board->user()->name); ?></td>
-                                  <td>
-                                      <div class="btn-group">
-                                          <button class="btn btn-xs btn-primary" type="button" data-user="<?php echo e(json_encode($user)); ?>" data-toggle="modal" data-target="#edit-modal">
-                                              <i class="fas fa-edit"></i></button>
-                                          <button class="btn btn-xs btn-danger" type="button" data-user="<?php echo e(json_encode($user)); ?>" data-toggle="modal" data-target="#delete-modal">
-                                              <i class="fas fa-trash"></i></button>
-                                      </div>
-                                  </td>
-                                </tr>
-                                  <?php endif; ?>
-                             <?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
+                                    <p>No actions available</p>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
             </div>
@@ -83,12 +79,36 @@
             <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
                     <?php if($boards->currentPage() > 1): ?>
-                        <li class="page-item"><a class="page-link" href="<?php echo e($boards->previousPageUrl()); ?>">&laquo;</a></li>
+                        <li class="page-item"><a class="page-link" href="<?php echo e($boards->previousPageUrl()); ?>">&laquo;</a>
+                        </li>
                         <li class="page-item"><a class="page-link" href="<?php echo e($boards->url(1)); ?>">1</a></li>
                     <?php endif; ?>
 
+                    <?php if($boards->currentPage() > 3): ?>
+                        <li class="page-item"><span class="page-link page-active">...</span></li>
+                    <?php endif; ?>
+                    <?php if($boards->currentPage() >= 3): ?>
+                        <li class="page-item"><a class="page-link"
+                                                 href="<?php echo e($boards->url($boards->currentPage() - 1)); ?>"><?php echo e($boards->currentPage() - 1); ?></a>
+                        </li>
+                    <?php endif; ?>
+
+                    <li class="page-item"><span class="page-link page-active"><?php echo e($boards->currentPage()); ?></span></li>
+
+                    <?php if($boards->currentPage() <= $boards->lastPage() - 2): ?>
+                        <li class="page-item"><a class="page-link"
+                                                 href="<?php echo e($boards->url($boards->currentPage() + 1)); ?>"><?php echo e($boards->currentPage() + 1); ?></a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if($boards->currentPage() < $boards->lastPage() - 2): ?>
+                        <li class="page-item"><span class="page-link page-active">...</span></li>
+                    <?php endif; ?>
+
                     <?php if($boards->currentPage() < $boards->lastPage() ): ?>
-                        <li class="page-item"><a class="page-link" href="<?php echo e($boards->url($boards->lastPage())); ?>"><?php echo e($boards->lastPage()); ?></a></li>
+                        <li class="page-item"><a class="page-link"
+                                                 href="<?php echo e($boards->url($boards->lastPage())); ?>"><?php echo e($boards->lastPage()); ?></a>
+                        </li>
                         <li class="page-item"><a class="page-link" href="<?php echo e($boards->nextPageUrl()); ?>">&raquo;</a></li>
                     <?php endif; ?>
                 </ul>
@@ -96,43 +116,42 @@
         </div>
         <!-- /.card -->
 
-        <div class="modal fade" id="edit-modal">
+        <div class="modal fade" id="boardEditModal">
             <div class="modal-dialog">
-                <form action="" method="POST">
-                <?php echo csrf_field(); ?>
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Edit board</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit board</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger hidden" id="boardEditAlert"></div>
+                        <div class="form-group">
+                            <label for="boardEditName">Name</label>
+                            <input id="boardEditName" type="text" value=""/>
                         </div>
-                        <div class="modal-body">
-                            <div id="editName"></div>
-                            <input type="hidden" name="editId" value="" />
-                            <div class="form-group">
-                                <label for="editname">Role</label>
-                                <select class="custom-select rounded-0" id="editRole">
-                                    <option value="<?php echo e(\App\Models\User::ROLE_USER); ?>">User</option>
-                                    <option value="<?php echo e(\App\Models\User::ROLE_ADMIN); ?>">Admin</option>
+                        <input type="hidden" id="boardEditId" value=""/>
+                        <label for="boardEditUser">User</label>
+                        <div class="col-12 col-sm-6">
+                            <div class="select2-purple">
+                                <select class="select2" multiple="multiple" style="width: 100%;">
+                                    <option selected></option>
+                                    <option></option>
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer justify-content-between">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
                     </div>
-                </form>
-                <!-- /.modal-content -->
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="boardEditButton">Save changes</button>
+                    </div>
+                </div>
             </div>
-            <!-- /.modal-dialog -->
         </div>
 
-        <div class="modal fade" id="delete-modal">
+        <div class="modal fade" id="boardDeleteModal">
             <div class="modal-dialog">
-              <form action="" method="POST" id="delete-form">
-        <?php echo csrf_field(); ?>
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">Delete board</h4>
@@ -141,13 +160,13 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                      <div id="deleteName"></div>
-                      <input type="hidden" name="deleteId" value=""/>
-                        <p>Are you sure you want to delete that board you cant undo it?</p>
+                        <div class="alert alert-danger hidden" id="boardDeleteAlert"></div>
+                        <input type="hidden" id="boardDeleteId" value=""/>
+                        <p>Are you sure you want to delete<span id="boardDeleteName"></span>?</p>
                     </div>
                     <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">NO</button>
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" id="boardDeleteButton">Delete</button>
                     </div>
                 </div>
                 <!-- /.modal-content -->
