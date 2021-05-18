@@ -71,13 +71,15 @@
                             <td>
                                 <div class="btn-group">
                                     <button class="btn btn-xs btn-primary" type="button"
-                                            data-user="{{json_encode($task)}}" data-toggle="modal"
-                                            data-target="#edit-modal">
+                                            data-user="{{json_encode($task)}}"
+                                            data-toggle="modal"
+                                            data-target="#taskEditModal">
                                         <i class="fas fa-edit"></i></button>
                                     @if($user->role === \App\Models\User::ROLE_ADMIN || $user->id === $board->user->id)
                                         <button class="btn btn-xs btn-danger" type="button"
-                                                data-user="{{json_encode($task)}}" data-toggle="modal"
-                                                data-target="#delete-modal">
+                                                data-user="{{json_encode($task)}}"
+                                                data-toggle="modal"
+                                                data-target="#taskDeleteModal">
                                             <i class="fas fa-trash"></i></button>
                                     @endif
                                 </div>
