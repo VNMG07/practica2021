@@ -40,6 +40,25 @@ class Board extends Model
 
     /** @var string */
     protected $table = 'boards';
+    protected $fillable = [
+       'name',
+       'user_id',
+
+   ];
+
+
+    /**
+     * Boot method
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($board) {
+            $board->boardUsers()->delete();
+            $board->tasks()->delete();
+        });
+    }
 
     /**
      * @return BelongsTo

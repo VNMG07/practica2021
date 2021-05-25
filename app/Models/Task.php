@@ -46,6 +46,14 @@ class Task extends Model
     /** @var string */
     protected $table = 'tasks';
 
+    protected $fillable = [
+          'board_id',
+          'name',
+          'description',
+          'assignment',
+          'status'
+    ];
+
     /**
      * @return BelongsTo
      */
